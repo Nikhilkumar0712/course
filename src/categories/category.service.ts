@@ -51,22 +51,30 @@ export class CategoryService {
   async getCategoryById(id: string) {
     try {
       const objectId = new Types.ObjectId(id);
-      const category = await this.categoryModel.findOne({ _id: objectId })
-
+      const category = await this.categoryModel.findOne({ _id: objectId });
+  
       if (!category) {
         return {
           message: 'Category not found',
-          success: false
+          success: false,
         };
       }
-
+  
+      const subcategories = await this.subCategoryModel.find({ category: objectId });
+  
       return {
         data: {
           _id: category._id,
           categoryName: category.categoryName,
+          subcategories: subcategories.map(subcategory => ({
+            _id: subcategory._id,
+            subCategoryName: subcategory.subCategoryName,
+            createdAt: subcategory.createdAt,
+            updatedAt: subcategory.updatedAt,
+          })),
         },
         message: "Category fetched successfully",
-        success: true
+        success: true,
       };
     } catch (error) {
       console.error('Error in getCategoryById:', error.message);
@@ -76,6 +84,7 @@ export class CategoryService {
       };
     }
   }
+  
 
 
 
